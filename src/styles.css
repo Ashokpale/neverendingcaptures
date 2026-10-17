@@ -318,3 +318,45 @@
     object-position: center center;
   }
 }
+
+.header-cta,
+.text-link,
+.card-overlay b,
+.film-play,
+.footer a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-cta svg,
+.text-link svg,
+.card-overlay b svg,
+.film-play svg,
+.footer a svg {
+  color: var(--gold);
+  flex: none;
+}
+
+.hero-index .current {
+  color: var(--paper);
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
