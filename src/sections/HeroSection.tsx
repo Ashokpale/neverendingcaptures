@@ -1,4 +1,4 @@
-import { ArrowDown } from "lucide-react";
+import { ArrowDown, ArrowUpRight } from "lucide-react";
 import { imagePath } from "../config/site";
 
 const slides = ["hero-01.jpg", "hero-02.jpg", "hero-03.jpg", "hero-04.jpg"];
@@ -19,17 +19,24 @@ export function HeroSection() {
           ))}
         </div>
       </div>
-      <div className="hero-vignette" />
-      <div className="hero-content reveal">
-        <p className="eyebrow">NEVER ENDING CAPTURES</p>
-        <h1>
-          Stories
-          <br />
-          <em>That Never End.</em>
+      <div className="hero-vignette" aria-hidden="true" />
+      <div className="hero-content">
+        <p className="eyebrow hero-meta">HYDERABAD, INDIA <span>·</span> PHOTO &amp; FILM</p>
+        <h1 className="hero-title">
+          <span className="hero-title-line"><span>Stories</span></span>
+          <span className="hero-title-line"><em>That Never End.</em></span>
         </h1>
         <p className="hero-sub">
-          PHOTOGRAPHY <span>·</span> FILMS <span>·</span> VISUAL STORIES
+          Photography, films and visual stories made to be remembered.
         </p>
+        <div className="hero-actions">
+          <a className="hero-cta hero-cta--primary" href="#work">
+            Explore our work <ArrowDown aria-hidden="true" size={15} />
+          </a>
+          <a className="hero-cta hero-cta--secondary" href="#contact">
+            Start your story <ArrowUpRight aria-hidden="true" size={15} />
+          </a>
+        </div>
       </div>
       <div className="hero-index" aria-label="Slideshow">
         <span className="line" />
@@ -43,8 +50,9 @@ export function HeroSection() {
           </span>
         ))}
       </div>
-      <a className="scroll-label" href="#work">
-        SCROLL <ArrowDown aria-hidden="true" size={12} />
+      <a className="scroll-label" href="#work" aria-label="Scroll to explore our work">
+        <span>SCROLL TO EXPLORE</span>
+        <ArrowDown aria-hidden="true" size={14} />
       </a>
     </section>
   );

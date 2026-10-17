@@ -1,108 +1,146 @@
-import { ArrowRight, ArrowUpRight } from "lucide-react";
-import { imagePath } from "../config/site";
-
-const categories = [
-  {
-    title: "Weddings",
-    caption: "Real moments. Lasting stories.",
-    image: "wedding-bw.jpg",
-    alt: "Wedding photography",
-    href: "#weddings",
-  },
-  {
-    title: "Portraits",
-    caption: "People. Emotion. Character.",
-    image: "bridal-portrait.jpg",
-    alt: "Traditional portrait photography",
-    href: "#portraits",
-  },
-  {
-    title: "Interiors",
-    caption: "Spaces that speak.",
-    image: "interior-01.jpg",
-    alt: "Interior photography",
-    href: "#interiors",
-  },
-  {
-    title: "Lifestyle",
-    caption: "Every chapter deserves to be remembered.",
-    image: "lifestyle-01.jpg",
-    alt: "Lifestyle portrait at the beach",
-    href: "#lifestyle",
-  },
-];
-
-const portraits = [
-  ["portrait-green.jpg", "Traditional portrait"],
-  ["portrait-dramatic.jpg", "Dramatic portrait"],
-  ["portrait-bw.jpg", "Black and white portrait"],
-  ["dance-01.jpg", "Classical dance portrait"],
-  ["dance-02.jpg", "Classical dance portrait"],
-  ["portrait-saree.jpg", "Traditional saree portrait"],
-];
+import { useEffect, useRef, useState } from "react";
+import { ArrowLeft, ArrowRight, ArrowUpRight, X } from "lucide-react";
+import { siteConfig, imagePath } from "../config/site";
+import { portraitGallery, services } from "../data/portfolio";
+import { acquireScrollLock } from "../utils/scrollLock";
 
 export function PortfolioSections() {
+  const [selectedImage, setSelectedImage] = useState<number | null>(null);
+  const lightboxRef = useRef<HTMLDivElement>(null);
+  const lightboxCloseRef = useRef<HTMLButtonElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const isLightboxOpen = selectedImage !== null;
+
+  useEffect(() => {
+    if (!isLightboxOpen) {
+      previousFocusRef.current?.focus();
+      return;
+    }
+
+    previousFocusRef.current =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    const releaseScrollLock = acquireScrollLock();
+    lightboxCloseRef.current?.focus();
+
+    return () => {
+      releaseScrollLock();
+    };
+  }, [isLightboxOpen]);
+
+  useEffect(() => {
+    if (!isLightboxOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setSelectedImage(null);
+      if (event.key === "ArrowRight") {
+        setSelectedImage((index) =>
+          index === null ? null : (index + 1) % portraitGallery.length,
+        );
+      }
+      if (event.key === "ArrowLeft") {
+        setSelectedImage((index) =>
+          index === null
+            ? null
+            : (index - 1 + portraitGallery.length) % portraitGallery.length,
+        );
+      }
+      if (event.key === "Tab") {
+        const buttons = lightboxRef.current?.querySelectorAll("button");
+        const first = buttons?.[0];
+        const last = buttons?.[buttons.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last?.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first?.focus();
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isLightboxOpen]);
+
   return (
     <>
       <section className="intro section-pad reveal">
-        <div className="section-kicker">01 / THE STUDIO</div>
+        <div className="section-kicker"><span>01</span> / THE STUDIO</div>
         <div className="intro-grid">
-          <h2>
+          <h2 className="display-heading">
             We capture
             <br />
             <em>what lasts.</em>
           </h2>
-          <div>
+          <div className="intro-copy">
             <p className="lead">
-              Never Ending Captures is a photography and filmmaking studio built
-              around real moments, thoughtful frames and stories that stay long
-              after the day is over.
+              We are a photography and filmmaking studio drawn to honest
+              moments, thoughtful frames, and the stories that stay with us
+              long after the day is over.
             </p>
             <a className="text-link" href="#about">
-              Discover our approach <ArrowUpRight aria-hidden="true" size={13} />
+              Discover our approach <ArrowUpRight aria-hidden="true" size={14} />
             </a>
           </div>
         </div>
+        <div className="section-rule" aria-hidden="true" />
       </section>
 
       <section className="work section-pad" id="work">
         <div className="section-heading reveal">
           <div>
-            <div className="section-kicker">02 / SELECTED WORK</div>
-            <h2>
-              Stories in <em>frames.</em>
-            </h2>
+            <div className="section-kicker"><span>02</span> / SELECTED WORK</div>
+            <h2 className="display-heading">Stories in <em>frames.</em></h2>
           </div>
-          <p>Wedding days, portraits, spaces and the people who bring them to life.</p>
+          <p>
+            A selection of the people, celebrations, and spaces we have had the
+            joy of seeing through a lens.
+          </p>
         </div>
-        <div className="category-grid">
-          {categories.map((category, index) => (
-            <a
-              className={`category-card reveal${index === 0 ? " card-large" : ""}`}
-              href={category.href}
-              key={category.title}
-            >
-              <img src={imagePath(category.image)} alt={category.alt} />
-              <div className="card-overlay">
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <h3>{category.title}</h3>
-                <p>{category.caption}</p>
-                <b>
-                  Explore <ArrowRight aria-hidden="true" size={13} />
-                </b>
-              </div>
-            </a>
-          ))}
+        <div className="work-grid">
+          <a className="work-tile work-tile--wedding reveal" href="#weddings">
+            <img src={imagePath("wedding-bw.jpg")} alt="A couple during their wedding ceremony" />
+            <span className="work-index">01 / CELEBRATIONS</span>
+            <span className="work-title">Weddings <ArrowUpRight aria-hidden="true" /></span>
+            <span className="work-hover">VIEW STORY</span>
+          </a>
+          <a className="work-tile work-tile--portrait reveal" href="#portraits">
+            <img src={imagePath("bridal-portrait.jpg")} alt="A bridal portrait in warm light" loading="lazy" />
+            <span className="work-index">02 / PEOPLE</span>
+            <span className="work-title">Portraits <ArrowUpRight aria-hidden="true" /></span>
+            <span className="work-hover">VIEW STORY</span>
+          </a>
+          <a className="work-tile work-tile--interiors reveal" href="#interiors">
+            <img src={imagePath("interior-01.jpg")} alt="A considered residential interior" loading="lazy" />
+            <span className="work-index">03 / SPACES</span>
+            <span className="work-title">Interiors <ArrowUpRight aria-hidden="true" /></span>
+            <span className="work-hover">VIEW STORY</span>
+          </a>
+          <a className="work-tile work-tile--lifestyle reveal" href="#lifestyle">
+            <img src={imagePath("lifestyle-01.jpg")} alt="A child enjoying a day by the sea" loading="lazy" />
+            <span className="work-index">04 / EVERYDAY</span>
+            <span className="work-title">Lifestyle <ArrowUpRight aria-hidden="true" /></span>
+            <span className="work-hover">VIEW STORY</span>
+          </a>
+          <a className="work-tile work-tile--film reveal" href="#films">
+            <img src={imagePath("hero-03.jpg")} alt="A couple sharing a moment outdoors" loading="lazy" />
+            <span className="work-index">05 / MOVING IMAGE</span>
+            <span className="work-title">Films <ArrowUpRight aria-hidden="true" /></span>
+            <span className="work-hover">WATCH FILM</span>
+          </a>
         </div>
       </section>
 
-      <section className="story-feature" id="weddings">
+      <section className="story-feature section-pad" id="weddings">
         <div className="story-image reveal">
-          <img src={imagePath("wedding-couple.jpg")} alt="Wedding couple outdoors" />
+          <img src={imagePath("wedding-couple.jpg")} alt="A couple together on their wedding day" loading="lazy" />
+          <span className="image-note">A day, held in memory</span>
         </div>
         <div className="story-copy reveal">
-          <div className="section-kicker">03 / WEDDINGS</div>
-          <h2>
+          <div className="section-kicker"><span>03</span> / WEDDINGS</div>
+          <h2 className="display-heading">
             The day.
             <br />
             <em>The feeling.</em>
@@ -113,7 +151,7 @@ export function PortfolioSections() {
             editorial eye and a documentary heart.
           </p>
           <a className="text-link" href="#contact">
-            Plan your wedding story <ArrowUpRight aria-hidden="true" size={13} />
+            Plan your wedding story <ArrowUpRight aria-hidden="true" size={14} />
           </a>
         </div>
       </section>
@@ -121,18 +159,23 @@ export function PortfolioSections() {
       <section className="gallery-section section-pad" id="portraits">
         <div className="section-heading reveal">
           <div>
-            <div className="section-kicker">04 / PORTRAITS</div>
-            <h2>
-              Faces carry <em>stories.</em>
-            </h2>
+            <div className="section-kicker"><span>04</span> / PORTRAITS</div>
+            <h2 className="display-heading">Faces carry <em>stories.</em></h2>
           </div>
           <p>Portraits with atmosphere, expression and space to breathe.</p>
         </div>
-        <div className="masonry">
-          {portraits.map(([image, alt]) => (
-            <figure className="masonry-item reveal" key={image}>
-              <img src={imagePath(image)} alt={alt} loading="lazy" />
-            </figure>
+        <div className="portrait-grid">
+          {portraitGallery.map((image, index) => (
+            <button
+              className={`portrait-item portrait-item--${index + 1} reveal`}
+              type="button"
+              onClick={() => setSelectedImage(index)}
+              aria-label={`View image: ${image.alt}`}
+              key={image.src}
+            >
+              <img src={imagePath(image.src)} alt={image.alt} loading="lazy" />
+              <span>{image.caption}</span>
+            </button>
           ))}
         </div>
       </section>
@@ -144,10 +187,11 @@ export function PortfolioSections() {
             alt="Child playing on the beach"
             loading="lazy"
           />
+          <span className="lifestyle-caption">The beautiful in-between</span>
         </div>
         <div className="lifestyle-copy reveal">
-          <div className="section-kicker">05 / LIFESTYLE</div>
-          <h2>
+          <div className="section-kicker"><span>05</span> / LIFESTYLE</div>
+          <h2 className="display-heading">
             Every chapter
             <br />
             <em>matters.</em>
@@ -162,8 +206,8 @@ export function PortfolioSections() {
       <section className="interiors section-pad" id="interiors">
         <div className="section-heading reveal">
           <div>
-            <div className="section-kicker">06 / INTERIORS &amp; ARCHITECTURE</div>
-            <h2>
+            <div className="section-kicker"><span>06</span> / INTERIORS &amp; ARCHITECTURE</div>
+            <h2 className="display-heading">
               Spaces deserve
               <br />
               <em>their own story.</em>
@@ -176,40 +220,81 @@ export function PortfolioSections() {
         </div>
         <div className="interior-grid">
           <figure className="interior-main reveal">
-            <img
-              src={imagePath("interior-01.jpg")}
-              alt="Luxury living room interior"
-              loading="lazy"
-            />
+            <img src={imagePath("interior-01.jpg")} alt="Luxury living room interior" loading="lazy" />
+            <figcaption>Living spaces · Hyderabad</figcaption>
           </figure>
           <figure className="interior-side reveal">
-            <img
-              src={imagePath("interior-02.jpg")}
-              alt="Modern white interior"
-              loading="lazy"
-            />
+            <img src={imagePath("interior-02.jpg")} alt="Modern residential interior" loading="lazy" />
+            <figcaption>Light, form &amp; material</figcaption>
           </figure>
           <figure className="interior-detail reveal">
-            <img
-              src={imagePath("interior-03.jpg")}
-              alt="Architectural dining detail"
-              loading="lazy"
-            />
+            <img src={imagePath("interior-03.jpg")} alt="Architectural dining detail" loading="lazy" />
+            <figcaption>Details in the everyday</figcaption>
           </figure>
+        </div>
+      </section>
+
+      <section className="commercial section-pad" id="commercial">
+        <div className="commercial-image reveal">
+          <img
+            src={imagePath("story-design.jpg")}
+            alt="An editorial story from the studio portfolio"
+            loading="lazy"
+          />
+          <span className="commercial-image-note">Image-led storytelling</span>
+        </div>
+        <div className="commercial-copy reveal">
+          <div className="section-kicker"><span>07</span> / FOR BRANDS &amp; PEOPLE</div>
+          <h2 className="display-heading">Visuals that <em>move.</em></h2>
+          <p>
+            Considered photography and films for brands, products, events, and
+            places—with a focus on feeling, not just appearances.
+          </p>
+          <ul className="service-tags" aria-label="Commercial services">
+            <li>Brand campaigns</li>
+            <li>Promotional films</li>
+            <li>Product photography</li>
+            <li>Events &amp; spaces</li>
+          </ul>
+          <a className="text-link" href="#contact">
+            Start a conversation <ArrowUpRight aria-hidden="true" size={14} />
+          </a>
+        </div>
+      </section>
+
+      <section className="services section-pad" id="services">
+        <div className="services-intro reveal">
+          <div className="section-kicker"><span>08</span> / WHAT WE DO</div>
+          <h2 className="display-heading">Made for <em>your story.</em></h2>
+          <p>A thoughtful process, from the first conversation to the final frame.</p>
+          <ol className="process-list">
+            <li><span>01</span> Discover the story</li>
+            <li><span>02</span> Plan the shoot</li>
+            <li><span>03</span> Capture the moments</li>
+            <li><span>04</span> Deliver the work</li>
+          </ol>
+        </div>
+        <div className="service-list reveal">
+          {services.map((service, index) => (
+            <details className="service-row" key={service.title}>
+              <summary>
+                <span className="service-number">{String(index + 1).padStart(2, "0")}</span>
+                <span>{service.title}</span>
+                <ArrowUpRight aria-hidden="true" size={18} />
+              </summary>
+              <p>{service.description}</p>
+            </details>
+          ))}
         </div>
       </section>
 
       <section className="about section-pad" id="about">
         <div className="about-image reveal">
-          <img
-            src={imagePath("portrait-bw.jpg")}
-            alt="Black and white portrait"
-            loading="lazy"
-          />
+          <img src={imagePath("portrait-bw.jpg")} alt="Black and white portrait" loading="lazy" />
         </div>
         <div className="about-copy reveal">
-          <div className="section-kicker">08 / ABOUT NEC</div>
-          <h2>
+          <div className="section-kicker"><span>09</span> / ABOUT THE STUDIO</div>
+          <h2 className="display-heading">
             More than
             <br />
             <em>a frame.</em>
@@ -219,22 +304,71 @@ export function PortfolioSections() {
             Our approach blends honest observation with intentional composition,
             whether we&apos;re documenting a wedding, a person, a brand or a space.
           </p>
+          <p>
+            Based in {siteConfig.location}, we bring a calm presence, a curious
+            eye, and care for the small details to every story we are invited to
+            tell.
+          </p>
           <div className="about-stats">
-            <div>
-              <strong>PHOTO</strong>
-              <span>Still stories</span>
-            </div>
-            <div>
-              <strong>FILM</strong>
-              <span>Moving memories</span>
-            </div>
-            <div>
-              <strong>SPACE</strong>
-              <span>Visual design</span>
-            </div>
+            <div><strong>PHOTO</strong><span>Still stories</span></div>
+            <div><strong>FILM</strong><span>Moving memories</span></div>
+            <div><strong>SPACE</strong><span>Visual design</span></div>
           </div>
+          <a className="text-link" href="#contact">
+            Meet us where your story begins <ArrowUpRight aria-hidden="true" size={14} />
+          </a>
         </div>
       </section>
+
+      {selectedImage !== null && (
+        <div
+          className="lightbox"
+          ref={lightboxRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Portrait gallery"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) setSelectedImage(null);
+          }}
+        >
+          <button
+            className="lightbox-close"
+            ref={lightboxCloseRef}
+            type="button"
+            aria-label="Close image viewer"
+            onClick={() => setSelectedImage(null)}
+          >
+            <X aria-hidden="true" />
+          </button>
+          <button
+            className="lightbox-arrow lightbox-previous"
+            type="button"
+            aria-label="Previous image"
+            onClick={() =>
+              setSelectedImage(
+                (selectedImage - 1 + portraitGallery.length) % portraitGallery.length,
+              )
+            }
+          >
+            <ArrowLeft aria-hidden="true" />
+          </button>
+          <figure>
+            <img
+              src={imagePath(portraitGallery[selectedImage].src)}
+              alt={portraitGallery[selectedImage].alt}
+            />
+            <figcaption>{portraitGallery[selectedImage].caption}</figcaption>
+          </figure>
+          <button
+            className="lightbox-arrow lightbox-next"
+            type="button"
+            aria-label="Next image"
+            onClick={() => setSelectedImage((selectedImage + 1) % portraitGallery.length)}
+          >
+            <ArrowRight aria-hidden="true" />
+          </button>
+        </div>
+      )}
     </>
   );
 }

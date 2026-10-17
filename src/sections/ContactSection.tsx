@@ -9,13 +9,16 @@ export function ContactSection() {
   return (
     <section className="contact section-pad" id="contact">
       <div className="contact-inner reveal">
-        <div className="section-kicker">09 / LET&apos;S CREATE</div>
-        <h2>
+        <div className="section-kicker"><span>11</span> / LET&apos;S CREATE</div>
+        <h2 className="display-heading">
           Have a story
           <br />
           <em>to tell?</em>
         </h2>
-        <p>Tell us what you&apos;re planning and we&apos;ll get back to you.</p>
+        <p>
+          Tell us what you&apos;re planning and let&apos;s create something worth
+          remembering.
+        </p>
         <div className="contact-actions">
           <a
             className="primary-btn"
@@ -51,6 +54,10 @@ export function ContactSection() {
             </a>
           </span>
         </div>
+        <p className="contact-note">
+          Every good story begins with a conversation. We would love to hear
+          yours.
+        </p>
       </div>
     </section>
   );

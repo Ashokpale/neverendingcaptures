@@ -28,13 +28,14 @@ static host. Public images and video are served from `public/`.
 ```text
 public/             Images and video served as-is
 src/
-  components/       Shared site chrome
+  components/       Navigation, footer, and cursor
   config/           Contact details and site configuration
+  data/             Portfolio image and service content
   hooks/            Scroll and animation lifecycle
-  sections/         Homepage sections
+  sections/         Editorial portfolio sections
   App.tsx           Page composition
   main.tsx          React entry point
-  styles.css        Existing site styles and responsive layout
+  styles.css        Design system and responsive layout
   tailwind.css      Tailwind CSS entry point
 index.html          Vite HTML shell and metadata
 vite.config.ts      Vite, React, and Tailwind plugins
